@@ -16,21 +16,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class MappingService {
-//    @Autowired
-//    private RequestMappingHandlerMapping handlerMapping;
-//    private final Map<String, RequestMappingInfo> mappingInfoMap = new ConcurrentHashMap<>();
-//
-//    public void registerMapping(Object service, String name) {
-//        for (Method method : service.getClass().getDeclaredMethods()) {
-//            RequestMappingInfo mappingInfo = RequestMappingInfo.paths("/" + name + "/" + method.getName()).methods(RequestMethod.POST).build();
-//            handlerMapping.registerMapping(mappingInfo, service, method);
-//            mappingInfoMap.put("/" + name + "/" + method.getName(), mappingInfo);
-//        }
-//    }
-//
-//    public void unRegisterMapping(Object service, String name) {
-//        for (Method method : service.getClass().getDeclaredMethods()) {
-//            handlerMapping.unregisterMapping(mappingInfoMap.get("/" + name + "/" + method.getName()));
-//        }
-//    }
+    @Autowired
+    private RequestMappingHandlerMapping handlerMapping;
+    private final Map<String, RequestMappingInfo> mappingInfoMap = new ConcurrentHashMap<>();
+
+    public void registerMapping(Object service, String name) {
+        for (Method method : service.getClass().getDeclaredMethods()) {
+            RequestMappingInfo mappingInfo = RequestMappingInfo.paths("/" + name + "/" + method.getName()).methods(RequestMethod.POST).build();
+            handlerMapping.registerMapping(mappingInfo, service, method);
+            mappingInfoMap.put("/" + name + "/" + method.getName(), mappingInfo);
+        }
+    }
+
+    public void unRegisterMapping(Object service, String name) {
+        for (Method method : service.getClass().getDeclaredMethods()) {
+            handlerMapping.unregisterMapping(mappingInfoMap.get("/" + name + "/" + method.getName()));
+        }
+    }
 }
