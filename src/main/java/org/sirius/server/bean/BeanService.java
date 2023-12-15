@@ -30,7 +30,7 @@ public class BeanService implements DisposableBean {
     @Autowired
     private CachingService cachingService;
     @AutoBean
-    private DBService DBService;
+    private DBService dbService;
     private final Map<Class<?>, Object> beanPool = new HashMap<>();
 
     public Object getBean(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, IOException, ClassNotFoundException {
@@ -71,7 +71,7 @@ public class BeanService implements DisposableBean {
                 }
                 field.set(object, beanPool.get(fieldClass));
             } else if (field.getAnnotation(AutoDB.class) != null) {
-                warpper = DBService.getAutoData(field);
+                warpper = dbService.getAutoData(field);
                 field.set(object, warpper);
             }
         }

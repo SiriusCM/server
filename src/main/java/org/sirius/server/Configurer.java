@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -47,15 +45,5 @@ public class Configurer implements AsyncConfigurer {
     @Bean
     public Random random() {
         return new Random();
-    }
-
-    @Bean("oa-date")
-    public SimpleDateFormat simpleDateFormatOA() {
-        return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
-    }
-
-    @Bean("task-date")
-    public SimpleDateFormat simpleDateFormatTask() {
-        return new SimpleDateFormat("yyyy/MM/dd/");
     }
 }

@@ -3,7 +3,6 @@ package org.sirius.server.dispatch;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import lombok.Getter;
 import org.sirius.server.bean.BeanService;
 import org.sirius.server.cache.CachingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import java.lang.reflect.Method;
  */
 @Service
 @Scope("prototype")
-@Getter
 public class DispatchService extends SimpleChannelInboundHandler<ByteBuf> {
     @Autowired
     private ConfigurableListableBeanFactory configurableListableBeanFactory;

@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * @time 2023/6/28
  */
 
-@Data
 @Service
 public class BootService implements DisposableBean {
     @Autowired
