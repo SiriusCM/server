@@ -7,6 +7,8 @@ import org.sirius.server.cache.CachingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
@@ -20,15 +22,35 @@ import java.util.Map;
 @Scope("prototype")
 public class EventService {
     @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
     private CachingService cachingService;
     @AutoBean
     private BeanService beanService;
+    @AutoBean
+    private long playerId;
 
     @SneakyThrows
-    public void publishEvent(ApplicationEvent event) {
+    public void publishLocal(ApplicationEvent event) {
         Map<Class<?>, Object> servicePool = beanService.getBeanPool();
         for (Method method : cachingService.getEventMethods(event.getClass())) {
             method.invoke(servicePool.get(method.getDeclaringClass()), event);
         }
+    }
+
+    public void publishRemote(ApplicationEvent event) {
+        publishLocal(event);
+        RemoteEvent remoteEvent = new RemoteEvent();
+        remoteEvent.setPlayerId(playerId);
+        remoteEvent.setEvent(event);
+        stringRedisTemplate.convertAndSend("event", remoteEvent);
+    }
+
+    @EventListener(RemoteEvent.class)
+    public void listenRemoteEvent(RemoteEvent event) {
+        if (event.getPlayerId() != playerId) {
+            return;
+        }
+        publishLocal(event.getEvent());
     }
 }

@@ -1,4 +1,4 @@
-package org.sirius.server.redirect;
+package org.sirius.server.remote;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -21,12 +21,12 @@ import org.springframework.stereotype.Service;
 public class RedirectService implements DisposableBean {
     private Channel proxyChannel;
 
-    @AfterReturning(value = "@annotation(org.sirius.server.redirect.Connect)", returning = "proxyChannel")
+    @AfterReturning(value = "@annotation(org.sirius.server.remote.Connect)", returning = "proxyChannel")
     public void connect(Channel proxyChannel) throws InterruptedException {
         this.proxyChannel = proxyChannel;
     }
 
-    @Around("@annotation(org.sirius.server.redirect.Redirect) && args(msgId, data)")
+    @Around("@annotation(org.sirius.server.remote.Redirect) && args(msgId, data)")
     public void redirect(ProceedingJoinPoint joinPoint, int msgId, byte[] data) throws Throwable {
         if (proxyChannel == null) {
             joinPoint.proceed();

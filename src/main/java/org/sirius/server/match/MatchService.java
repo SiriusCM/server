@@ -1,9 +1,7 @@
 package org.sirius.server.match;
 
-import lombok.Getter;
-import org.sirius.server.redirect.RedirectInfo;
-import org.sirius.server.room.Room;
-import org.sirius.server.room.RoomRepository;
+import org.sirius.server.remote.RemoteService;
+import org.sirius.server.remote.ServiceInfo;
 import org.sirius.server.room.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,15 +11,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 /**
  * @author gaoliandi
  * @time 2023/8/7
  */
-@Getter
 @Service
 public class MatchService {
     @Autowired
@@ -29,17 +25,10 @@ public class MatchService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
-    private RoomRepository roomRepository;
-    @Autowired
-    private Random random;
+    private RemoteService remoteService;
     @Value("${server.id}")
     private String serverId;
-    @Value("${server.host}")
-    private String host;
-    @Value("${tcp.port}")
-    private int port;
     private String roomHost;
-    private final Map<String, RoomService> roomServiceMap = new ConcurrentHashMap<>();
 
     @EventListener({ApplicationReadyEvent.class})
     public void onReady(ApplicationReadyEvent event) {
@@ -48,18 +37,14 @@ public class MatchService {
         roomHost = RoomService.class.getSimpleName() + "/";
     }
 
-    public RedirectInfo registerRoomService() {
-        Room room = new Room();
-        roomRepository.save(room);
-        String roomName = roomHost + room.getId();
+    public ServiceInfo registerRoomService() throws RemoteException {
         RoomService roomService = configurableListableBeanFactory.createBean(RoomService.class);
-        roomService.registerRoomService(room, roomName);
-        roomServiceMap.put(roomName, roomService);
-        return new RedirectInfo(roomName, host, port);
+        String roomName = roomHost + System.currentTimeMillis();
+        roomService.setRoomName(roomName);
+        return remoteService.rebind(roomName, roomService);
     }
 
-    public void disRegisterRoomService(String name) {
-        RoomService roomService = roomServiceMap.remove(name);
-        configurableListableBeanFactory.destroyBean(roomService);
+    public void unRegisterRoomService(String name) throws NotBoundException, RemoteException {
+        remoteService.unbind(name);
     }
 }

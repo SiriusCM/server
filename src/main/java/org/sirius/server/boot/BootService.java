@@ -10,7 +10,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import lombok.Data;
 import org.sirius.server.dispatch.DispatchService;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +37,13 @@ public class BootService implements DisposableBean {
     @Qualifier("worker")
     private NioEventLoopGroup workerNioEventLoopGroup;
     @Value("${tcp.port}")
-    private int serverPort;
+    private int port;
     private Channel serverChannel;
 
     @Async
     @EventListener({ApplicationReadyEvent.class})
     public void onReady(ApplicationReadyEvent event) throws InterruptedException {
-        serverChannel = listen(serverPort);
+        serverChannel = listen(port);
     }
 
     public Channel listen(int port) throws InterruptedException {

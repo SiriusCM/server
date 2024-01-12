@@ -1,4 +1,4 @@
-package org.sirius.server.redirect;
+package org.sirius.server.remote;
 
 import java.lang.annotation.*;
 

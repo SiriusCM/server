@@ -1,13 +1,12 @@
 package org.sirius.server.room;
 
-import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
-import org.sirius.server.sync.Sync;
+import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 
 /**
@@ -15,25 +14,17 @@ import java.util.Random;
  * @time 2023/8/7
  */
 @Getter
+@Setter
 @Service
 @Scope("prototype")
-public class RoomService {
-    private Room room;
+public class RoomService extends UnicastRemoteObject implements IRoomService {
     private String roomName;
-    private final List<ChannelHandlerContext> channelHandlerContextList = new ArrayList<>();
 
-    public void registerRoomService(Room room, String roomName) {
-        this.room = room;
-        this.roomName = roomName;
+    protected RoomService() throws RemoteException {
     }
 
-    @Sync
-    public void enter(ChannelHandlerContext channelHandlerContext) {
-        channelHandlerContextList.add(channelHandlerContext);
-    }
-
-    @Sync
-    public Object fight(Object object) throws InterruptedException {
+    @Override
+    public Object fight(Object object) throws InterruptedException, RemoteException {
         Thread.sleep(10);
         return new Random().nextDouble();
     }

@@ -1,7 +1,7 @@
 package org.sirius.server.match;
 
 
-import org.sirius.server.redirect.RedirectInfo;
+import org.sirius.server.remote.ServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ public class MatchController {
     private MatchService matchService;
 
     @PostMapping(value = "/registerRoomService")
-    public RedirectInfo registerRoomService() throws RemoteException {
+    public ServiceInfo registerRoomService() throws RemoteException {
         return matchService.registerRoomService();
     }
 }
