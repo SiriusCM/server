@@ -2,8 +2,11 @@ package org.sirius.server.cache;
 
 
 import jakarta.persistence.Id;
+import lombok.Data;
+import org.sirius.server.bean.BeanService;
 import org.sirius.server.dispatch.MsgId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -12,35 +15,38 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gaoliandi
  * @time 2023/7/27
  */
 @Service
+@Data
 public class CachingService {
+    @Autowired
+    private ConfigurableListableBeanFactory configurableListableBeanFactory;
     @Autowired
     private Map<String, JpaRepository<?, ?>> jpaRepositoryMap;
 
-    @Cacheable(cacheNames = "class")
-    public List<Class<?>> getClassPool() throws IOException, ClassNotFoundException {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory();
-        List<Class<?>> classList = new ArrayList<>();
-        for (Resource resource : resolver.getResources("classpath:**/*.class")) {
-            MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
-            String className = metadataReader.getClassMetadata().getClassName();
-            Class<?> clazz = Class.forName(className);
-            classList.add(clazz);
+    private final Map<Long, BeanService> beanServiceMap = new ConcurrentHashMap<>();
+
+    @Scheduled(cron = "0 */10 * * * *")
+    public void clearBean() {
+        long now = System.currentTimeMillis();
+        Iterator<BeanService> iterator = beanServiceMap.values().iterator();
+        while (iterator.hasNext()) {
+            BeanService beanService = iterator.next();
+            if (beanService.getInactiveTimeStamp() - now > 10 * 60 * 1000) {
+                beanService.getBeanPool().values().stream().filter(Objects::nonNull).forEach(configurableListableBeanFactory::destroyBean);
+            }
         }
-        return classList;
     }
 
     @Cacheable(cacheNames = "dispatch")
@@ -87,8 +93,8 @@ public class CachingService {
     }
 
     @Cacheable(cacheNames = "idField")
-    public Field getIdField(Class<?> actualClass) {
-        for (Field field : actualClass.getDeclaredFields()) {
+    public Field getIdField(Class<?> entityClass) {
+        for (Field field : entityClass.getDeclaredFields()) {
             if (field.getAnnotation(Id.class) != null) {
                 field.setAccessible(true);
                 return field;
@@ -97,22 +103,8 @@ public class CachingService {
         return null;
     }
 
-    @Cacheable(cacheNames = "mapKeyMethod")
-    public Method getMapKeyMethod(Class<?> actualClass) throws NoSuchMethodException {
-        Field field = getIdField(actualClass);
-        if (field == null) {
-            return null;
-        }
-        field.setAccessible(true);
-        String methodName = field.getName();
-        methodName = "get" + methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
-        Method m = actualClass.getMethod(methodName);
-        m.setAccessible(true);
-        return m;
-    }
-
     @Cacheable(cacheNames = "jpaRepository")
-    public JpaRepository<?, ?> getJpaRepositoryName(Class<?> actualClass) throws IOException, ClassNotFoundException {
+    public JpaRepository<?, ?> getJpaRepository(Class<?> actualClass) throws IOException, ClassNotFoundException {
         for (Class<?> clazz : getClassPool()) {
             if (JpaRepository.class.isAssignableFrom(clazz)) {
                 ParameterizedType parameterizedType = (ParameterizedType) clazz.getGenericInterfaces()[0];
@@ -127,34 +119,27 @@ public class CachingService {
     }
 
     @Cacheable(cacheNames = "autoDB")
-    public Class<?> getAutoDBActualClass(Object object) throws IOException, ClassNotFoundException {
-        if (object instanceof Field) {
-            Field field = (Field) object;
-            field.setAccessible(true);
-            Class<?> actualClass = getActualClass(field.getType(), field.getGenericType());
-            if (getJpaRepositoryName(actualClass) != null) {
-                return actualClass;
-            }
-        } else if (object instanceof Parameter) {
-            Parameter parameter = (Parameter) object;
-            Class<?> actualClass = getActualClass(parameter.getType(), parameter.getParameterizedType());
-            if (getJpaRepositoryName(actualClass) != null) {
-                return actualClass;
-            }
+    public Class<?> getEntityClass(Field field) {
+        if (field.getType() == List.class) {
+            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+            Type[] types = parameterizedType.getActualTypeArguments();
+            return (Class<?>) types[0];
+        } else {
+            return field.getType();
         }
-        return null;
     }
 
-    private Class<?> getActualClass(Class<?> objectClass, Type type) {
-        if (objectClass == List.class) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Type[] types = parameterizedType.getActualTypeArguments();
-            objectClass = (Class<?>) types[0];
-        } else if (objectClass == Map.class) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Type[] types = parameterizedType.getActualTypeArguments();
-            objectClass = (Class<?>) types[1];
+    @Cacheable(cacheNames = "class")
+    public List<Class<?>> getClassPool() throws IOException, ClassNotFoundException {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory();
+        List<Class<?>> classList = new ArrayList<>();
+        for (Resource resource : resolver.getResources("classpath:**/*.class")) {
+            MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+            String className = metadataReader.getClassMetadata().getClassName();
+            Class<?> clazz = Class.forName(className);
+            classList.add(clazz);
         }
-        return objectClass;
+        return classList;
     }
 }

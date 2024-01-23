@@ -1,10 +1,9 @@
 package org.sirius.server.bean;
 
-import lombok.Getter;
+import lombok.Data;
 import org.sirius.server.cache.CachingService;
 import org.sirius.server.data.AutoDB;
 import org.sirius.server.data.DBService;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -15,7 +14,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author gaoliandi
@@ -23,15 +25,18 @@ import java.util.*;
  */
 @Service
 @Scope("prototype")
-@Getter
-public class BeanService implements DisposableBean {
+@Data
+public class BeanService {
     @Autowired
     private ConfigurableListableBeanFactory configurableListableBeanFactory;
     @Autowired
     private CachingService cachingService;
     @AutoBean
     private DBService dbService;
+
     private final Map<Class<?>, Object> beanPool = new HashMap<>();
+
+    private long inactiveTimeStamp;
 
     public Object getBean(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, IOException, ClassNotFoundException {
         if (!beanPool.containsKey(clazz)) {
@@ -82,10 +87,5 @@ public class BeanService implements DisposableBean {
         configurableListableBeanFactory.autowireBean(base);
         beanPool.put(clazz, configurableListableBeanFactory.initializeBean(base, clazz.getName()));
         return base;
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        beanPool.values().stream().filter(Objects::nonNull).forEach(configurableListableBeanFactory::destroyBean);
     }
 }

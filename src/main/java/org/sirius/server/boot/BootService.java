@@ -10,7 +10,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import org.sirius.server.dispatch.DispatchService;
+import org.sirius.server.dispatch.MsgService;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,7 +54,7 @@ public class BootService implements DisposableBean {
                 ChannelPipeline pipeline = socketChannel.pipeline();
                 pipeline.addLast("decoder", new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4));
                 pipeline.addLast("encoder", new LengthFieldPrepender(4, false));
-                pipeline.addLast("handler", configurableListableBeanFactory.createBean(DispatchService.class));
+                pipeline.addLast("handler", configurableListableBeanFactory.createBean(MsgService.class));
             }
         });
         return bootstrap.bind(port).sync().channel();

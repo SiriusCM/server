@@ -15,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Scope("prototype")
@@ -25,49 +24,32 @@ public class DBService {
     @AutoBean
     private long playerId;
     private final Map<Class<?>, Object> dataPool = new HashMap<>();
-    private final Map<Class<?>, Object> dataListPool = new HashMap<>();
-    private final Map<Class<?>, Object> dataMapPool = new HashMap<>();
+    private final Map<Class<?>, List<?>> dataListPool = new HashMap<>();
 
     public Object getAutoData(Field field) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Class<?> actualClass = cachingService.getAutoDBActualClass(field);
-        Object warpper;
+        Class<?> entityClass = cachingService.getEntityClass(field);
         if (field.getType() == List.class) {
-            if (dataListPool.containsKey(actualClass)) {
-                warpper = dataListPool.get(actualClass);
+            if (dataListPool.containsKey(entityClass)) {
+                return dataListPool.get(entityClass);
             } else {
-                JpaRepository repository = cachingService.getJpaRepositoryName(actualClass);
-                Object example = cachingService.getConstructor(actualClass).newInstance();
-                cachingService.getIdField(actualClass).set(example, playerId);
-                warpper = repository.findAll(Example.of(example));
-                dataListPool.put(actualClass, warpper);
-            }
-        } else if (field.getType() == Map.class) {
-            if (dataMapPool.containsKey(actualClass)) {
-                warpper = dataMapPool.get(actualClass);
-            } else {
-                JpaRepository repository = cachingService.getJpaRepositoryName(actualClass);
-                Object example = cachingService.getConstructor(actualClass).newInstance();
-                cachingService.getIdField(actualClass).set(example, playerId);
-                List<?> list = repository.findAll(Example.of(example));
-                warpper = list.stream().collect(Collectors.groupingBy(e -> {
-                    try {
-                        return cachingService.getMapKeyMethod(actualClass).invoke(e);
-                    } catch (IllegalAccessException | InvocationTargetException |
-                             NoSuchMethodException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }));
-                dataMapPool.put(actualClass, warpper);
+                JpaRepository repository = cachingService.getJpaRepository(entityClass);
+                Object example = cachingService.getConstructor(entityClass).newInstance();
+                cachingService.getIdField(entityClass).set(example, playerId);
+                List<?> dataList = repository.findAll(Example.of(example));
+                dataListPool.put(entityClass, dataList);
+                return dataList;
             }
         } else {
-            if (dataPool.containsKey(actualClass)) {
-                warpper = dataPool.get(actualClass);
+            if (dataPool.containsKey(entityClass)) {
+                return dataPool.get(entityClass);
             } else {
-                JpaRepository repository = cachingService.getJpaRepositoryName(actualClass);
-                warpper = repository.findById(playerId).orElse(null);
-                dataPool.put(actualClass, warpper);
+                JpaRepository repository = cachingService.getJpaRepository(entityClass);
+                Object data = repository.findById(playerId).orElse(null);
+                if (data != null) {
+                    dataPool.put(entityClass, data);
+                }
+                return data;
             }
         }
-        return warpper;
     }
 }
