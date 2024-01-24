@@ -1,7 +1,7 @@
 package org.sirius.server.event;
 
 import lombok.SneakyThrows;
-import org.sirius.server.bean.BeanService;
+import org.sirius.server.data.DataService;
 import org.sirius.server.cache.CachingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -31,12 +31,12 @@ public class DispatchService {
     @Autowired
     private CachingService cachingService;
 
-    public void dispatchMsg(BeanService beanService, int msgId, byte[] data) throws IOException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    public void dispatchMsg(DataService dataService, int msgId, byte[] data) throws IOException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         //CodedInputStream codedInputStream = CodedInputStream.newInstance(data, 4, data.length - 4);
-        beanService.getBeanPool().put(int.class, msgId);
-        beanService.getBeanPool().put(byte[].class, data);
+        dataService.getBeanPool().put(int.class, msgId);
+        dataService.getBeanPool().put(byte[].class, data);
         for (Method method : cachingService.getDispatchMethods(msgId)) {
-            method.invoke(beanService.getBean(method.getDeclaringClass()), beanService.getParameters(method));
+            method.invoke(dataService.getBean(method.getDeclaringClass()), dataService.getParameters(method));
         }
     }
 

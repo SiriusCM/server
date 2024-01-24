@@ -1,8 +1,8 @@
 package org.sirius.server.event;
 
 import lombok.SneakyThrows;
-import org.sirius.server.bean.AutoBean;
-import org.sirius.server.bean.BeanService;
+import org.sirius.server.data.AutoBean;
+import org.sirius.server.data.DataService;
 import org.sirius.server.cache.CachingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
@@ -26,13 +26,13 @@ public class EventService {
     @Autowired
     private CachingService cachingService;
     @AutoBean
-    private BeanService beanService;
+    private DataService dataService;
     @AutoBean
     private long playerId;
 
     @SneakyThrows
     public void publishLocal(ApplicationEvent event) {
-        Map<Class<?>, Object> servicePool = beanService.getBeanPool();
+        Map<Class<?>, Object> servicePool = dataService.getBeanPool();
         for (Method method : cachingService.getEventMethods(event.getClass())) {
             method.invoke(servicePool.get(method.getDeclaringClass()), event);
         }

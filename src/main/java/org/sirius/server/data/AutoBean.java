@@ -1,4 +1,4 @@
-package org.sirius.server.bean;
+package org.sirius.server.data;
 
 import java.lang.annotation.*;
 

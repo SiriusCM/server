@@ -1,6 +1,6 @@
 package org.sirius.server.player;
 
-import org.sirius.server.bean.AutoBean;
+import org.sirius.server.data.AutoBean;
 import org.sirius.server.dispatch.MsgId;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;

@@ -8,7 +8,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gaoliandi
@@ -18,7 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MappingService {
     @Autowired
     private RequestMappingHandlerMapping handlerMapping;
-    private final Map<String, RequestMappingInfo> mappingInfoMap = new ConcurrentHashMap<>();
+    @Autowired
+    private Map<String, RequestMappingInfo> mappingInfoMap;
 
     public void registerMapping(Object service, String name) {
         for (Method method : service.getClass().getDeclaredMethods()) {

@@ -9,7 +9,6 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,21 +21,22 @@ public class RemoteService {
     private ConfigurableListableBeanFactory configurableListableBeanFactory;
     @Autowired
     private Registry registry;
+    @Autowired
+    private Map<String, Remote> remoteMap;
     @Value("${server.host}")
     private String host;
     @Value("${rmi.port}")
     private int port;
-    private final Map<String, Remote> RemoteMap = new HashMap<>();
 
     public synchronized ServiceInfo rebind(String name, Remote obj) throws RemoteException {
-        RemoteMap.put(name, obj);
+        remoteMap.put(name, obj);
         registry.rebind(name, obj);
         return new ServiceInfo(name, host, port);
     }
 
     public synchronized void unbind(String name) throws NotBoundException, RemoteException {
         registry.unbind(name);
-        Remote remote = RemoteMap.remove(name);
+        Remote remote = remoteMap.remove(name);
         configurableListableBeanFactory.destroyBean(remote);
     }
 }
