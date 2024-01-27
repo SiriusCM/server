@@ -20,4 +20,9 @@ public class ServiceInfo {
         this.host = host;
         this.port = port;
     }
+
+    @Override
+    public String toString() {
+        return "rmi://" + host + ":" + port + "/" + name;
+    }
 }

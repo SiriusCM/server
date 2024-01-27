@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.sirius.server.cache.CachingService;
 import org.sirius.server.data.DataService;
-import org.sirius.server.event.DispatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -32,15 +31,17 @@ public class MsgService extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        if (dataServiceMap.containsKey(18L)) {
-            dataService = dataServiceMap.get(18L);
+        long playerId = 18L;
+        if (dataServiceMap.containsKey(playerId)) {
+            dataService = dataServiceMap.get(playerId);
         } else {
             dataService = configurableListableBeanFactory.createBean(DataService.class);
             dataService.getBeanPool().put(DataService.class, dataService);
             dataService.getBeanPool().put(MsgService.class, this);
             dataService.getBeanPool().put(ChannelHandlerContext.class, ctx);
-            dataService.getBeanPool().put(long.class, 18L);
+            dataService.getBeanPool().put(long.class, playerId);
             dataService.autowireBean(dataService);
+            dataServiceMap.put(playerId, dataService);
         }
     }
 

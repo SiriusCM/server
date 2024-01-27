@@ -1,6 +1,6 @@
 package org.sirius.server.match;
 
-import org.sirius.server.remote.RemoteService;
+import org.sirius.server.remote.RmiService;
 import org.sirius.server.remote.ServiceInfo;
 import org.sirius.server.room.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +25,19 @@ public class MatchService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
-    private RemoteService remoteService;
+    private RmiService rmiService;
     @Value("${server.id}")
     private String serverId;
+    @Value("${server.host}")
+    private String host;
+    @Value("${server.port}")
+    private String port;
     private String roomHost;
 
     @EventListener({ApplicationReadyEvent.class})
     public void onReady(ApplicationReadyEvent event) {
         String matchName = MatchService.class.getSimpleName();
-        stringRedisTemplate.opsForHash().put(matchName, serverId, "http://10.4.4.208:1026/match/");
+        stringRedisTemplate.opsForHash().put(matchName, serverId, "http://" + host + ":" + port + "/match/");
         roomHost = RoomService.class.getSimpleName() + "/";
     }
 
@@ -41,10 +45,10 @@ public class MatchService {
         RoomService roomService = configurableListableBeanFactory.createBean(RoomService.class);
         String roomName = roomHost + System.currentTimeMillis();
         roomService.setRoomName(roomName);
-        return remoteService.rebind(roomName, roomService);
+        return rmiService.rebind(roomName, roomService);
     }
 
     public void unRegisterRoomService(String name) throws NotBoundException, RemoteException {
-        remoteService.unbind(name);
+        rmiService.unbind(name);
     }
 }

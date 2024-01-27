@@ -1,8 +1,8 @@
-package org.sirius.server.event;
+package org.sirius.server.dispatch;
 
 import lombok.SneakyThrows;
-import org.sirius.server.data.DataService;
 import org.sirius.server.cache.CachingService;
+import org.sirius.server.data.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,6 +31,11 @@ public class DispatchService {
     @Autowired
     private CachingService cachingService;
 
+    @EventListener({ApplicationReadyEvent.class})
+    public void onReady(ApplicationReadyEvent event) {
+        lettuceConnectionFactory.getConnection().subscribe(this::dispatchEvent, "event".getBytes());
+    }
+
     public void dispatchMsg(DataService dataService, int msgId, byte[] data) throws IOException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         //CodedInputStream codedInputStream = CodedInputStream.newInstance(data, 4, data.length - 4);
         dataService.getBeanPool().put(int.class, msgId);
@@ -40,13 +45,8 @@ public class DispatchService {
         }
     }
 
-    @EventListener({ApplicationReadyEvent.class})
-    public void onReady(ApplicationReadyEvent event) {
-        lettuceConnectionFactory.getConnection().subscribe(this::onMessage, "event".getBytes());
-    }
-
     @SneakyThrows
-    public void onMessage(Message message, byte[] pattern) {
+    public void dispatchEvent(Message message, byte[] pattern) {
         byte[] channel = message.getChannel();
         byte[] body = message.getBody();
         Object event = serializer.deserialize(message.getBody());

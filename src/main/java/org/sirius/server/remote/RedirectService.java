@@ -22,7 +22,7 @@ public class RedirectService implements DisposableBean {
     private Channel proxyChannel;
 
     @AfterReturning(value = "@annotation(org.sirius.server.remote.Connect)", returning = "proxyChannel")
-    public void connect(Channel proxyChannel) throws InterruptedException {
+    public void connect(Channel proxyChannel) {
         this.proxyChannel = proxyChannel;
     }
 

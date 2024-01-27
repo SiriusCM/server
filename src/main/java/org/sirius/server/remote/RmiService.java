@@ -16,7 +16,7 @@ import java.util.Map;
  * @Date 2024/1/12
  */
 @Service
-public class RemoteService {
+public class RmiService {
     @Autowired
     private ConfigurableListableBeanFactory configurableListableBeanFactory;
     @Autowired
@@ -29,9 +29,10 @@ public class RemoteService {
     private int port;
 
     public synchronized ServiceInfo rebind(String name, Remote obj) throws RemoteException {
+        ServiceInfo serviceInfo = new ServiceInfo(name, host, port);
         remoteMap.put(name, obj);
-        registry.rebind(name, obj);
-        return new ServiceInfo(name, host, port);
+        registry.rebind(serviceInfo.toString(), obj);
+        return serviceInfo;
     }
 
     public synchronized void unbind(String name) throws NotBoundException, RemoteException {

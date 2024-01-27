@@ -30,12 +30,12 @@ public class RoomController {
     private IRoomService iRoomService;
 
     @MsgId(id = 1101)
-    public void match(int msgId, byte[] data) throws InterruptedException, RemoteException, NotBoundException {
+    public void match(int msgId, byte[] data) throws RemoteException, NotBoundException {
         String matchName = (String) stringRedisTemplate.opsForHash().get(MatchService.class.getSimpleName(), String.valueOf(1));
         RestTemplate restTemplate = new RestTemplate();
         ServiceInfo serviceInfo = restTemplate.postForObject(matchName + "registerRoomService", Map.of(), ServiceInfo.class);
         Registry registry = LocateRegistry.getRegistry(serviceInfo.getHost(), serviceInfo.getPort());
-        iRoomService = (RoomService) registry.lookup(serviceInfo.getName());
+        iRoomService = (IRoomService) registry.lookup(serviceInfo.toString());
     }
 
     @MsgId(id = 1103)
