@@ -2,7 +2,7 @@ package org.sirius.server.match;
 
 import org.sirius.server.remote.RmiService;
 import org.sirius.server.remote.ServiceInfo;
-import org.sirius.server.room.RoomService;
+import org.sirius.server.room.SceneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -32,20 +32,20 @@ public class MatchService {
     private String host;
     @Value("${server.port}")
     private String port;
-    private String roomHost;
+    private String sceneHost;
 
     @EventListener({ApplicationReadyEvent.class})
     public void onReady(ApplicationReadyEvent event) {
         String matchName = MatchService.class.getSimpleName();
-        stringRedisTemplate.opsForHash().put(matchName, serverId, "http://" + host + ":" + port + "/match/");
-        roomHost = RoomService.class.getSimpleName() + "/";
+        stringRedisTemplate.opsForSet().add(matchName, "http://" + host + ":" + port + "/match/");
+        sceneHost = SceneService.class.getSimpleName() + "/";
     }
 
     public ServiceInfo registerRoomService() throws RemoteException {
-        RoomService roomService = configurableListableBeanFactory.createBean(RoomService.class);
-        String roomName = roomHost + System.currentTimeMillis();
-        roomService.setRoomName(roomName);
-        return rmiService.rebind(roomName, roomService);
+        SceneService sceneService = configurableListableBeanFactory.createBean(SceneService.class);
+        String sceneName = sceneHost + System.currentTimeMillis();
+        sceneService.setName(sceneName);
+        return rmiService.rebind(sceneName, sceneService);
     }
 
     public void unRegisterRoomService(String name) throws NotBoundException, RemoteException {

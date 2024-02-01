@@ -17,10 +17,10 @@ import java.util.Random;
 @Setter
 @Service
 @Scope("prototype")
-public class RoomService extends UnicastRemoteObject implements IRoomService {
-    private String roomName;
+public class SceneService extends UnicastRemoteObject implements ISceneService {
+    private String name;
 
-    protected RoomService() throws RemoteException {
+    protected SceneService() throws RemoteException {
     }
 
     @Override

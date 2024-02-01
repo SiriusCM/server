@@ -15,6 +15,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author gaoliandi
@@ -22,24 +24,35 @@ import java.util.Map;
  */
 @Controller
 @Scope("prototype")
-public class RoomController {
+public class SceneController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private MatchService matchService;
-    private IRoomService iRoomService;
+    @Autowired
+    private Random random;
+    private ISceneService iSceneService;
 
     @MsgId(id = 1101)
     public void match(int msgId, byte[] data) throws RemoteException, NotBoundException {
-        String matchName = (String) stringRedisTemplate.opsForHash().get(MatchService.class.getSimpleName(), String.valueOf(1));
+        Set<String> set = stringRedisTemplate.opsForSet().members(MatchService.class.getSimpleName());
+        assert set != null;
+        int target = random.nextInt(set.size());
+        var iterator = set.iterator();
+        int index = 0;
+        String matchName = null;
+        while (iterator.hasNext() && index < target) {
+            matchName = iterator.next();
+            index++;
+        }
         RestTemplate restTemplate = new RestTemplate();
         ServiceInfo serviceInfo = restTemplate.postForObject(matchName + "registerRoomService", Map.of(), ServiceInfo.class);
         Registry registry = LocateRegistry.getRegistry(serviceInfo.getHost(), serviceInfo.getPort());
-        iRoomService = (IRoomService) registry.lookup(serviceInfo.toString());
+        iSceneService = (ISceneService) registry.lookup(serviceInfo.toString());
     }
 
     @MsgId(id = 1103)
     public void fight(int msgId, byte[] data) throws InterruptedException, RemoteException {
-        iRoomService.fight(1);
+        iSceneService.fight(1);
     }
 }
