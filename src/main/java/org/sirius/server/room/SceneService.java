@@ -24,7 +24,7 @@ public class SceneService extends UnicastRemoteObject implements ISceneService {
     }
 
     @Override
-    public Object fight(Object object) throws InterruptedException, RemoteException {
+    public synchronized Object fight(Object object) throws InterruptedException, RemoteException {
         Thread.sleep(10);
         return new Random().nextDouble();
     }
