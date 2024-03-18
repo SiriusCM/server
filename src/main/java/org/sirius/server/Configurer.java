@@ -4,6 +4,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -14,6 +15,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -65,6 +67,12 @@ public class Configurer implements AsyncConfigurer {
     @Bean
     public JdkSerializationRedisSerializer jdkSerializationRedisSerializer() {
         return new JdkSerializationRedisSerializer();
+    }
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
     @Bean

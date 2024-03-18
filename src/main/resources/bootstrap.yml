@@ -6,7 +6,7 @@ eureka:
 spring:
   cloud:
     config:
-      name: single
+      name: alone-1-1
       discovery:
         enabled: true
         service-id: config
