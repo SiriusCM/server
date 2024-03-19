@@ -19,8 +19,8 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
-    @PostMapping(value = "/registerRoomService")
-    public ServiceInfo registerRoomService() throws RemoteException {
-        return matchService.registerRoomService();
+    @PostMapping(value = "/registerSceneService")
+    public ServiceInfo registerSceneService() throws RemoteException {
+        return matchService.registerSceneService();
     }
 }

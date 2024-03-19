@@ -20,17 +20,17 @@ public class MappingService {
     @Autowired
     private Map<String, RequestMappingInfo> mappingInfoMap;
 
-    public void registerMapping(Object service, String name) {
+    public void registerMapping(String name, Object service) {
         for (Method method : service.getClass().getDeclaredMethods()) {
-            RequestMappingInfo mappingInfo = RequestMappingInfo.paths("/" + name + "/" + method.getName()).methods(RequestMethod.POST).build();
+            RequestMappingInfo mappingInfo = RequestMappingInfo.paths(name + '/' + method.getName()).methods(RequestMethod.POST).build();
             handlerMapping.registerMapping(mappingInfo, service, method);
-            mappingInfoMap.put("/" + name + "/" + method.getName(), mappingInfo);
+            mappingInfoMap.put(method.getName(), mappingInfo);
         }
     }
 
-    public void unRegisterMapping(Object service, String name) {
-        for (Method method : service.getClass().getDeclaredMethods()) {
-            handlerMapping.unregisterMapping(mappingInfoMap.get("/" + name + "/" + method.getName()));
+    public void unRegisterMapping(String name, Class<?> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            handlerMapping.unregisterMapping(mappingInfoMap.get(name + '/' + method.getName()));
         }
     }
 }

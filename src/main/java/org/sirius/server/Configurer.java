@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * @author 高连棣
@@ -44,19 +43,14 @@ public class Configurer implements AsyncConfigurer {
         return Executors.newVirtualThreadPerTaskExecutor();
     }
 
-    @Bean
-    public ThreadFactory threadFactory() {
-        return Thread.ofVirtual().factory();
-    }
-
     @Bean("boss")
     public NioEventLoopGroup nioEventLoopGroupBoss() {
         return new NioEventLoopGroup(2, new DefaultThreadFactory("boss"));
     }
 
     @Bean("worker")
-    public NioEventLoopGroup nioEventLoopGroupWorker(ThreadFactory threadFactory) {
-        return new NioEventLoopGroup(10000, threadFactory);
+    public NioEventLoopGroup nioEventLoopGroupWorker() {
+        return new NioEventLoopGroup(10000, Thread.ofVirtual().factory());
     }
 
     @Bean
@@ -65,14 +59,19 @@ public class Configurer implements AsyncConfigurer {
     }
 
     @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
     public JdkSerializationRedisSerializer jdkSerializationRedisSerializer() {
         return new JdkSerializationRedisSerializer();
     }
 
     @Bean
-    @LoadBalanced
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public Random random() {
+        return new Random();
     }
 
     @Bean
@@ -87,10 +86,5 @@ public class Configurer implements AsyncConfigurer {
             classList.add(clazz);
         }
         return classList;
-    }
-
-    @Bean
-    public Random random() {
-        return new Random();
     }
 }

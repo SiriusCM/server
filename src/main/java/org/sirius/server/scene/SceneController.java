@@ -1,4 +1,4 @@
-package org.sirius.server.room;
+package org.sirius.server.scene;
 
 
 import org.sirius.server.dispatch.MsgId;
@@ -7,7 +7,7 @@ import org.sirius.server.remote.ServiceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.rmi.NotBoundException;
@@ -22,13 +22,11 @@ import java.util.Set;
  * @author gaoliandi
  * @time 2023/8/5
  */
-@Controller
+@RestController
 @Scope("prototype")
 public class SceneController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private MatchService matchService;
     @Autowired
     private Random random;
     private ISceneService iSceneService;
@@ -46,7 +44,7 @@ public class SceneController {
             index++;
         }
         RestTemplate restTemplate = new RestTemplate();
-        ServiceInfo serviceInfo = restTemplate.postForObject(matchName + "registerRoomService", Map.of(), ServiceInfo.class);
+        ServiceInfo serviceInfo = restTemplate.postForObject(matchName + "registerSceneService", Map.of(), ServiceInfo.class);
         Registry registry = LocateRegistry.getRegistry(serviceInfo.getHost(), serviceInfo.getPort());
         iSceneService = (ISceneService) registry.lookup(serviceInfo.toString());
     }

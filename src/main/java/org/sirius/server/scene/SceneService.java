@@ -1,4 +1,4 @@
-package org.sirius.server.room;
+package org.sirius.server.scene;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ import java.util.Random;
 public class SceneService extends UnicastRemoteObject implements ISceneService {
     private String name;
 
-    protected SceneService() throws RemoteException {
+    public SceneService() throws RemoteException {
     }
 
     @Override

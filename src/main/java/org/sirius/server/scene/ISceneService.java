@@ -1,4 +1,4 @@
-package org.sirius.server.room;
+package org.sirius.server.scene;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

@@ -1,8 +1,9 @@
 package org.sirius.server.match;
 
+import org.sirius.server.mapping.MappingService;
 import org.sirius.server.remote.RmiService;
 import org.sirius.server.remote.ServiceInfo;
-import org.sirius.server.room.SceneService;
+import org.sirius.server.scene.SceneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -26,6 +27,8 @@ public class MatchService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private RmiService rmiService;
+    @Autowired
+    private MappingService mappingService;
     @Value("${server.id}")
     private String serverId;
     @Value("${server.host}")
@@ -41,14 +44,16 @@ public class MatchService {
         sceneHost = SceneService.class.getSimpleName() + "/";
     }
 
-    public ServiceInfo registerRoomService() throws RemoteException {
+    public ServiceInfo registerSceneService() throws RemoteException {
         SceneService sceneService = configurableListableBeanFactory.createBean(SceneService.class);
         String sceneName = sceneHost + System.currentTimeMillis();
         sceneService.setName(sceneName);
+        mappingService.registerMapping(sceneName, sceneService);
         return rmiService.rebind(sceneName, sceneService);
     }
 
-    public void unRegisterRoomService(String name) throws NotBoundException, RemoteException {
+    public void unRegisterSceneService(String name) throws NotBoundException, RemoteException {
+        mappingService.unRegisterMapping(name, SceneService.class);
         rmiService.unbind(name);
     }
 }
