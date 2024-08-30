@@ -10,10 +10,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -29,10 +25,10 @@ public class SceneController {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private Random random;
-    private ISceneService iSceneService;
+    private SceneService sceneService;
 
     @MsgId(id = 1101)
-    public void match(int msgId, byte[] data) throws RemoteException, NotBoundException {
+    public void match(int msgId, byte[] data) {
         Set<String> set = stringRedisTemplate.opsForSet().members(MatchService.class.getSimpleName());
         assert set != null;
         int target = random.nextInt(set.size());
@@ -45,12 +41,10 @@ public class SceneController {
         }
         RestTemplate restTemplate = new RestTemplate();
         ServiceInfo serviceInfo = restTemplate.postForObject(matchName + "registerSceneService", Map.of(), ServiceInfo.class);
-        Registry registry = LocateRegistry.getRegistry(serviceInfo.getHost(), serviceInfo.getPort());
-        iSceneService = (ISceneService) registry.lookup(serviceInfo.toString());
     }
 
     @MsgId(id = 1103)
-    public void fight(int msgId, byte[] data) throws InterruptedException, RemoteException {
-        iSceneService.fight(1);
+    public void fight(int msgId, byte[] data) {
+        sceneService.fight(1);
     }
 }

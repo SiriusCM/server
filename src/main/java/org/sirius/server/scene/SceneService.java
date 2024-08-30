@@ -5,9 +5,8 @@ import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gaoliandi
@@ -17,15 +16,22 @@ import java.util.Random;
 @Setter
 @Service
 @Scope("prototype")
-public class SceneService extends UnicastRemoteObject implements ISceneService {
+public class SceneService implements IPulseObject {
     private String name;
+    private List<IPulseObject> worldObjectList = new ArrayList<>();
 
-    public SceneService() throws RemoteException {
+    @Sync
+    public void fight(Object object) {
+
+    }
+
+    @StartPulse
+    public void startPulse(Runnable runnable) {
+
     }
 
     @Override
-    public synchronized Object fight(Object object) throws InterruptedException, RemoteException {
-        Thread.sleep(10);
-        return new Random().nextDouble();
+    public void pulse() {
+        worldObjectList.forEach(IPulseObject::pulse);
     }
 }

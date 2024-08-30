@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * @author 高连棣
@@ -41,6 +42,11 @@ public class Configurer implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
         return Executors.newVirtualThreadPerTaskExecutor();
+    }
+
+    @Bean
+    public ThreadFactory threadFactory() {
+        return Thread.ofVirtual().factory();
     }
 
     @Bean("boss")
