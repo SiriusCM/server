@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: server
+  datasource:
+    url: jdbc:mysql://172.23.246.114:3306/game?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: gaoliandi
+    password: gaoliandi
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  data:
+    redis:
+      database: 1
+      host: 172.23.246.114
+      password: gaoliandi
+      port: 6379
+  cache:
+    cache-names: actualType,jpaRepository
+
+server:
+  id: 1001
+  port: 1128
+  gameport: 1026
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://172.23.246.114:8761/eureka/

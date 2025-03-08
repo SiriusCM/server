@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package com.sirius.server.msg;
+
+// 定义基础消息，包含不同类型的子消息
+message Message {
+  // 使用 oneof 字段表示不同类型的消息，同一时刻只能有一个字段被设置
+  oneof msgId {
+    LoginRequest login_request = 1001;
+    LogoutRequest logout_request = 1002;
+
+    ChatMessage chat_message = 2001;
+  }
+}
+
+// 登录请求消息
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// 登出请求消息
+message LogoutRequest {
+  string username = 1;
+}
+
+// 聊天消息
+message ChatMessage {
+  string sender = 1;
+  string content = 2;
+}
+
+// 定义请求消息
+message DBRequest {
+  int64 id = 1;
+  int64 humanId = 2;
+  string sql = 3;
+}
+
+// 定义响应消息
+message DBResponse {
+  string resultSet = 1;
+}
+
+// 定义服务
+service DBService {
+  // 定义服务方法
+  rpc sql (DBRequest) returns (DBResponse);
+}
