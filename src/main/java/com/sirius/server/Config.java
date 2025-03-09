@@ -1,6 +1,6 @@
 package com.sirius.server;
 
-import io.netty.channel.EventLoop;
+import io.netty.channel.nio.NioEventLoopGroup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -13,20 +13,30 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 @Configuration
 public class Config implements AsyncConfigurer {
-
-    public static final Map<EventLoop, MainThread> eventLoopMainThreadMap = new HashMap<>();
-
     @Override
     public Executor getAsyncExecutor() {
         return Executors.newVirtualThreadPerTaskExecutor();
+    }
+
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
+
+    @Bean("bossGroup")
+    public NioEventLoopGroup bossGroup() {
+        return new NioEventLoopGroup(1);
+    }
+
+    @Bean("workerGroup")
+    public NioEventLoopGroup workerGroup() {
+        return new NioEventLoopGroup();
     }
 
     @Bean
@@ -41,10 +51,5 @@ public class Config implements AsyncConfigurer {
             classList.add(clazz);
         }
         return classList;
-    }
-
-    @Bean
-    public ServerEndpointExporter serverEndpointExporter() {
-        return new ServerEndpointExporter();
     }
 }

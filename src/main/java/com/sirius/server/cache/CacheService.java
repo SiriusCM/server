@@ -1,6 +1,8 @@
 package com.sirius.server.cache;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,7 @@ public class CacheService {
     @Autowired
     private List<JpaRepository<?, Long>> jpaRepositoryList;
 
-    //    @Cacheable(cacheNames = "actualType")
+    @Cacheable(cacheNames = "actualType")
     public Class<?> getActualType(Field field) {
         if (field.getType() == List.class) {
             ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
@@ -27,7 +29,7 @@ public class CacheService {
         }
     }
 
-    //    @Cacheable(cacheNames = "jpaRepository")
+    @Cacheable(cacheNames = "jpaRepository")
     public JpaRepository<?, ?> getJpaRepository(Class<?> actualType) {
         for (JpaRepository<?, Long> jpaRepository : jpaRepositoryList) {
             Class<?> genericInterface = (Class<?>) jpaRepository.getClass().getGenericInterfaces()[0];

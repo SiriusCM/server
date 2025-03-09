@@ -1,5 +1,7 @@
 package com.sirius.server.io.endpoint;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.sirius.server.msg.Msg;
 import com.sirius.server.object.RoleObject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
@@ -10,10 +12,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
 
 @Component
 @ServerEndpoint(value = "/ws")
@@ -31,24 +29,9 @@ public class EndpointHandler implements ApplicationContextAware {
     }
 
     @OnMessage
-    public void onMessage(byte[] data) {
-//        Msg.Message message = Msg.Message.parseFrom(data);
-//        MsgInvoker msgInvoker = userService.buildMsg(message);
-//        msgInvoker.invoke();
-        ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
-        threadLocal.set(1);
-        threadLocal.remove();
-        Deque<Integer> deque = new LinkedList<>();
-        Queue<Integer> queue = new LinkedList<>();
-
-        queue.offer(1);
-        queue.poll();
-        queue.peek();
-
-        Stack<Integer> stack = new Stack<>();
-        stack.add(1);
-        stack.pop();
-        stack.peek();
+    public void onMessage(byte[] data) throws InvalidProtocolBufferException {
+        Msg.Message message = Msg.Message.parseFrom(data);
+        roleObject.dispatchMsg(message);
     }
 
     @OnOpen

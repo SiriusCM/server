@@ -1,6 +1,6 @@
 package com.sirius.server.item;
 
-import com.sirius.server.IRoleBean;
+import com.sirius.server.ioc.IRoleBean;
 import com.sirius.server.aop.MsgId;
 import com.sirius.server.ioc.AutoCache;
 import com.sirius.server.msg.Msg;

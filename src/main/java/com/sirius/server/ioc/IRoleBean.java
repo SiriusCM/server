@@ -1,4 +1,4 @@
-package com.sirius.server;
+package com.sirius.server.ioc;
 
 public interface IRoleBean {
 

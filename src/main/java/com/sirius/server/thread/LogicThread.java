@@ -1,7 +1,8 @@
-package com.sirius.server;
+package com.sirius.server.thread;
 
 import com.sirius.server.object.SceneObject;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Map;
 import java.util.Queue;
@@ -9,21 +10,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
-@Getter
-public class MainThread extends Thread implements IPulse {
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class LogicThread extends Thread implements IPulse {
 
-    private final Queue<Consumer<MainThread>> consumerQueue = new LinkedBlockingQueue<>();
+    private final Queue<Consumer<LogicThread>> consumerQueue = new LinkedBlockingQueue<>();
 
-    private final Map<Integer, SceneObject> sceneObjectMap = new ConcurrentHashMap<>();
+    private final Map<Long, SceneObject> sceneObjectMap = new ConcurrentHashMap<>();
 
-    public MainThread(String name) {
+    public LogicThread(String name) {
         super(name);
     }
 
     @Override
     public void pulse() throws Exception {
         while (!consumerQueue.isEmpty()) {
-            Consumer<MainThread> consumer = consumerQueue.poll();
+            Consumer<LogicThread> consumer = consumerQueue.poll();
             consumer.accept(this);
         }
         for (SceneObject sceneObject : sceneObjectMap.values()) {

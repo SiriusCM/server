@@ -1,6 +1,6 @@
 package com.sirius.server.item;
 
-import com.sirius.server.IRoleBean;
+import com.sirius.server.ioc.IRoleBean;
 import com.sirius.server.ioc.AutoBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
