@@ -32,6 +32,7 @@
         <protobuf-java.version>3.25.6</protobuf-java.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
         <spring-grpc.version>0.4.0</spring-grpc.version>
+        <os.detected.classifier>windows-x86_64</os.detected.classifier>
     </properties>
     <dependencies>
         <dependency>
