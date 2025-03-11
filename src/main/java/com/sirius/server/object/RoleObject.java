@@ -1,13 +1,13 @@
 package com.sirius.server.object;
 
-import com.sirius.server.thread.DBThread;
-import com.sirius.server.ioc.IRoleBean;
 import com.sirius.server.aop.MsgId;
 import com.sirius.server.cache.CacheService;
 import com.sirius.server.global.GlobalService;
 import com.sirius.server.ioc.AutoBean;
 import com.sirius.server.ioc.AutoCache;
+import com.sirius.server.ioc.IRoleBean;
 import com.sirius.server.msg.Msg;
+import com.sirius.server.thread.DBThread;
 import com.sirius.server.thread.ThreadService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoop;
@@ -42,6 +42,10 @@ public class RoleObject extends WorldObject {
 
     private RoleState roleState = RoleState.LOGIN;
 
+    private SceneObject sceneObject;
+
+    private DBThread dbThread;
+
     private Queue<Consumer<DBThread>> dbQueue = new LinkedList<>();
 
     private final Map<Class<?>, Object> poolMap = new HashMap<>();
@@ -66,7 +70,7 @@ public class RoleObject extends WorldObject {
 
     @MsgId(id = Msg.Message.MsgIdCase.LOGIN_REQUEST)
     public void loginRequest(Msg.LoginRequest loginRequest) {
-        globalService.getLoginQueue().add(this);
+        globalService.loginRequest(this);
     }
 
     @Override
@@ -75,11 +79,16 @@ public class RoleObject extends WorldObject {
 
     public void loginFinish() {
         EventLoop eventLoop = channelHandlerContext.channel().eventLoop();
-        threadService.getDbThreadMap().get(eventLoop).addDBQueue(this);
+        dbThread = threadService.getDbThreadMap().get(eventLoop);
+        dbThread.addDBQueue(this);
         roleBeanList.forEach(roleBean -> poolMap.put(roleBean.getClass(), roleBean));
         autowire();
         roleBeanList.forEach(IRoleBean::init);
-        this.roleState = RoleState.ONLINE;
+        roleState = RoleState.ONLINE;
+    }
+
+    public void logoutFinish() {
+        dbThread.removeDBQueue(this);
     }
 
     public void dispatchMsg(Msg.Message message) {

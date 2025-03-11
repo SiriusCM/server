@@ -2,6 +2,7 @@ package com.sirius.server.io.netty;
 
 import com.sirius.server.msg.Msg;
 import com.sirius.server.object.RoleObject;
+import com.sirius.server.object.RoleState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,6 @@ public class NettyHandler extends SimpleChannelInboundHandler<Msg.Message> {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         long now = System.currentTimeMillis();
         roleObject.setLogoutTime(now);
+        roleObject.setRoleState(RoleState.OFFLINE);
     }
 }

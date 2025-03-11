@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -17,7 +19,7 @@ public class ThreadService implements CommandLineRunner {
     @Autowired
     private EventLoopGroup workerGroup;
 
-    public final Map<EventLoop, LogicThread> logicThreadMap = new HashMap<>();
+    public final List<LogicThread> logicThreadList = new ArrayList<>();
 
     public final Map<EventLoop, DBThread> dbThreadMap = new HashMap<>();
 
@@ -25,12 +27,16 @@ public class ThreadService implements CommandLineRunner {
     public void run(String... args) throws Exception {
         for (EventExecutor eventExecutor : workerGroup) {
             EventLoop eventLoop = (EventLoop) eventExecutor;
-            LogicThread logicThread = new LogicThread("logic-" + eventLoop.hashCode());
-            logicThread.start();
-            logicThreadMap.put(eventLoop, logicThread);
             DBThread dbThread = new DBThread("db-" + eventLoop.hashCode());
             dbThread.start();
             dbThreadMap.put(eventLoop, dbThread);
+        }
+
+        int processors = Runtime.getRuntime().availableProcessors();
+        for (int i = 0; i < processors; i++) {
+            LogicThread logicThread = new LogicThread("logic-" + i);
+            logicThread.start();
+            logicThreadList.add(logicThread);
         }
     }
 }
