@@ -8,7 +8,6 @@ import com.sirius.server.ioc.AutoCache;
 import com.sirius.server.ioc.IRoleBean;
 import com.sirius.server.msg.Msg;
 import com.sirius.server.thread.DBThread;
-import com.sirius.server.thread.ThreadService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoop;
 import jakarta.websocket.Session;
@@ -32,9 +31,9 @@ import java.util.function.Consumer;
 @Component
 public class RoleObject extends WorldObject {
     @Autowired
-    private GlobalService globalService;
+    private Map<EventLoop, DBThread> dbThreadMap;
     @Autowired
-    private ThreadService threadService;
+    private GlobalService globalService;
     @Autowired
     private CacheService cacheService;
     @Autowired
@@ -79,7 +78,7 @@ public class RoleObject extends WorldObject {
 
     public void loginFinish() {
         EventLoop eventLoop = channelHandlerContext.channel().eventLoop();
-        dbThread = threadService.getDbThreadMap().get(eventLoop);
+        dbThread = dbThreadMap.get(eventLoop);
         dbThread.addDBQueue(this);
         roleBeanList.forEach(roleBean -> poolMap.put(roleBean.getClass(), roleBean));
         autowire();

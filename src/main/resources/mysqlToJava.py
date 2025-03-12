@@ -8,11 +8,22 @@ cursor.execute(sql)
 results = cursor.fetchall()
 fieldList = [{'type': 'String', 'name': 'name'}]
 
-with open('conf.ftl', 'r') as file:
+with open('excelObject.ftl', 'r') as file:
     template_str = file.read()
 
 template = Template(template_str)
-code = template.render(packageName='com.sirius.server', className='ConfTest', dbName='conftest', fieldList=fieldList)
+code = template.render(packageName='com.sirius.server.conf', className='ExcelTest', dbName='excel_test',
+                       fieldList=fieldList)
 
-with open('ConfTest.java', 'w', encoding='utf-8') as file:
+nameList = [{'className': 'ExcelTest', 'dbName': 'excel_test'}]
+with open('ExcelTest.java', 'w', encoding='utf-8') as file:
+    file.write(code)
+
+with open('excelConfig.ftl', 'r') as file:
+    template_str = file.read()
+
+template = Template(template_str)
+code = template.render(packageName='com.sirius.server.conf', nameList=nameList)
+
+with open('ExcelConfig.java', 'w', encoding='utf-8') as file:
     file.write(code)

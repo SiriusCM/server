@@ -4,6 +4,7 @@ import com.sirius.server.object.SceneObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ public class LogicThread extends Thread implements IPulse {
 
     private final Queue<Consumer<LogicThread>> consumerQueue = new LinkedBlockingQueue<>();
 
-    private final Map<Long, SceneObject> sceneObjectMap = new ConcurrentHashMap<>();
+    private final Map<Long, SceneObject> sceneObjectMap = new HashMap<>();
 
     public LogicThread(String name) {
         super(name);

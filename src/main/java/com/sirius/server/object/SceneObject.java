@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 
 public class SceneObject extends WorldObject {
 
-    private final Map<Long, WorldObject> worldObjectMap = new HashMap<>();
-
     private final Queue<Consumer<SceneObject>> consumerQueue = new LinkedBlockingQueue<>();
+
+    private final Map<Long, WorldObject> worldObjectMap = new HashMap<>();
 
     @Override
     public void pulse() {
