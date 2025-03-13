@@ -1,6 +1,7 @@
 package com.sirius.server.conf;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -9,18 +10,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
-public class ExcelConfig {
+public class ExcelConfig implements CommandLineRunner {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public void run(String... args) throws Exception {
+        reload();
+    }
 
     public static Map<Integer, ExcelTest> mapExcelTest = new HashMap<>();
 
-    public static void reload(JdbcTemplate jdbcTemplate) {
+
+    public void reload() {
+
         mapExcelTest = jdbcTemplate.queryForList("select * from excel_test", ExcelTest.class).stream()
                 .collect(Collectors.toMap(ExcelTest::sn, c -> c));
-    }
-    
-    @Bean
-    public Map<Integer, ExcelTest> mapExcelTest(JdbcTemplate jdbcTemplate) {
-        return jdbcTemplate.queryForList("select * from excel_test", ExcelTest.class).stream()
-                .collect(Collectors.toMap(ExcelTest::sn, c -> c));
+
     }
 }
