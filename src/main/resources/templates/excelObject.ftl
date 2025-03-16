@@ -1,4 +1,4 @@
 package {{packageName}};
 
-public record {{className}}(int sn{% for field in fieldList %}, {{field['type']}} {{field['name']}}{% endfor %}) {
+public record {{className}}({% for entry in entryList %}{{entry['Type']}} {{entry['Field']}}, {% endfor %}Object... params) {
 }

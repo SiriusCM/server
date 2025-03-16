@@ -18,14 +18,14 @@ public class ExcelConfig implements CommandLineRunner {
     public void run(String... args) throws Exception {
         reload();
     }
-
-    public static Map<Integer, ExcelTest> mapExcelTest = new HashMap<>();
-
+    
+    public static Map<Long, ExcelItem> mapExcelItem = new HashMap<>();
+    
 
     public void reload() {
-
-        mapExcelTest = jdbcTemplate.queryForList("select * from excel_test", ExcelTest.class).stream()
-                .collect(Collectors.toMap(ExcelTest::sn, c -> c));
-
+        
+        mapExcelItem = jdbcTemplate.queryForList("select * from item", ExcelItem.class).stream()
+        .collect(Collectors.toMap(ExcelItem::sn, c -> c));
+        
     }
 }

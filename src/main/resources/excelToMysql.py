@@ -1,8 +1,16 @@
+import os
+
 import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy_utils import database_exists, create_database
 
-df = pd.read_excel('test.xlsx')
-df.index.name = "id"
+engine = create_engine("mysql+pymysql://gaoliandi:gaoliandi@172.23.246.114:3306/excel")
+if not database_exists(engine.url):
+    create_database(engine.url)
 
-engine = create_engine("mysql+mysqlconnector://gaoliandi:gaoliandi@127.0.0.1:3306/conf", echo=False)
-df.to_sql(name='student', con=engine, if_exists="replace")
+current_directory = os.getcwd()
+for fileName in os.listdir(current_directory):
+    if 'xlsx' not in fileName:
+        continue
+    df = pd.read_excel(fileName)
+    df.to_sql(name=fileName.split('.')[0], con=engine, if_exists="replace", index=False)

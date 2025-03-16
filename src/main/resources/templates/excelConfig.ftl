@@ -16,15 +16,15 @@ public class ExcelConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-    reload();
+        reload();
     }
     {% for name in nameList %}
-    public static Map<Integer, {{name['className']}}> map{{name['className']}} = new HashMap<>();
+    public static Map<Long, {{name['className']}}> map{{name['className']}} = new HashMap<>();
     {% endfor %}
 
     public void reload() {
         {% for name in nameList %}
-        map{{name['className']}} = jdbcTemplate.queryForList("select * from {{name['dbName']}}", {{name['className']}}.class).stream()
+        map{{name['className']}} = jdbcTemplate.queryForList("select * from {{name['table']}}", {{name['className']}}.class).stream()
         .collect(Collectors.toMap({{name['className']}}::sn, c -> c));
         {% endfor %}
     }
