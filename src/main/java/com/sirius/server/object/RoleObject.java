@@ -6,7 +6,7 @@ import com.sirius.server.global.GlobalService;
 import com.sirius.server.ioc.AutoBean;
 import com.sirius.server.ioc.AutoCache;
 import com.sirius.server.ioc.IRoleBean;
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 import com.sirius.server.thread.DBThread;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoop;

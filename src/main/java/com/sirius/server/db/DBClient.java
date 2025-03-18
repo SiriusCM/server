@@ -1,6 +1,6 @@
 package com.sirius.server.db;
 
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.stereotype.Service;

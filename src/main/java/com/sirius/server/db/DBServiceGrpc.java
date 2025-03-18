@@ -1,6 +1,6 @@
 package com.sirius.server.db;
 
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 
@@ -10,14 +10,14 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  * </pre>
  */
 @javax.annotation.processing.Generated(
-    value = "by gRPC proto compiler (version 1.69.0)",
+    value = "by gRPC proto compiler (version 1.70.0)",
     comments = "Source: msg.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class DBServiceGrpc {
 
   private DBServiceGrpc() {}
 
-  public static final String SERVICE_NAME = "com.sirius.game.db.DBService";
+  public static final String SERVICE_NAME = "com.sirius.server.msg.DBService";
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<Msg.DBRequest,
@@ -63,6 +63,21 @@ public final class DBServiceGrpc {
         }
       };
     return DBServiceStub.newStub(factory, channel);
+  }
+
+  /**
+   * Creates a new blocking-style stub that supports all types of calls on the service
+   */
+  public static DBServiceBlockingV2Stub newBlockingV2Stub(
+      io.grpc.Channel channel) {
+    io.grpc.stub.AbstractStub.StubFactory<DBServiceBlockingV2Stub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<DBServiceBlockingV2Stub>() {
+        @Override
+        public DBServiceBlockingV2Stub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new DBServiceBlockingV2Stub(channel, callOptions);
+        }
+      };
+    return DBServiceBlockingV2Stub.newStub(factory, channel);
   }
 
   /**
@@ -160,6 +175,36 @@ public final class DBServiceGrpc {
 
   /**
    * A stub to allow clients to do synchronous rpc calls to service DBService.
+   * <pre>
+   * 定义服务
+   * </pre>
+   */
+  public static final class DBServiceBlockingV2Stub
+      extends io.grpc.stub.AbstractBlockingStub<DBServiceBlockingV2Stub> {
+    private DBServiceBlockingV2Stub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      super(channel, callOptions);
+    }
+
+    @Override
+    protected DBServiceBlockingV2Stub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      return new DBServiceBlockingV2Stub(channel, callOptions);
+    }
+
+    /**
+     * <pre>
+     * 定义服务方法
+     * </pre>
+     */
+    public Msg.DBResponse sql(Msg.DBRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getSqlMethod(), getCallOptions(), request);
+    }
+  }
+
+  /**
+   * A stub to allow clients to do limited synchronous rpc calls to service DBService.
    * <pre>
    * 定义服务
    * </pre>

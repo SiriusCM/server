@@ -1,6 +1,6 @@
 package com.sirius.server.aop;
 
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 
 import java.lang.annotation.*;
 

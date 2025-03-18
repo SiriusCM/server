@@ -1,6 +1,6 @@
 package com.sirius.server.io.netty;
 
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 import com.sirius.server.object.RoleObject;
 import com.sirius.server.object.RoleState;
 import io.netty.channel.ChannelHandlerContext;

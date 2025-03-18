@@ -3,7 +3,7 @@ package com.sirius.server.item;
 import com.sirius.server.ioc.IRoleBean;
 import com.sirius.server.aop.MsgId;
 import com.sirius.server.ioc.AutoCache;
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 

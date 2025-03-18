@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Config implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
-        return Executors.newVirtualThreadPerTaskExecutor();
+        return Executors.newCachedThreadPool();
     }
 
     @Bean("roleId")

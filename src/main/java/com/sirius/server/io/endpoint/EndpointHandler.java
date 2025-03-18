@@ -1,7 +1,7 @@
 package com.sirius.server.io.endpoint;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.sirius.server.msg.Msg;
+import com.sirius.server.Msg;
 import com.sirius.server.object.RoleObject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
